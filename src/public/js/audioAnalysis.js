@@ -1,5 +1,6 @@
 export default class AudioInput {
-  constructor() {
+  constructor(UI) {
+    this.UI = UI;
     this.keyPhrase = "computer";
     this.commandLog = [];
     this.audioTranscriptLog = [];
@@ -22,7 +23,7 @@ export default class AudioInput {
   async isAcceptableTimeLapse() {
     let now = Date.now();
     let timeLapse = (now - this.lastEntryTimestamp) / 1000;
-    if (timeLapse < 10) {
+    if (timeLapse < 20) {
       console.log(`[ ${timeLapse} seconds ] Inactivity Marker...`);
 
       return true;
@@ -47,6 +48,8 @@ export default class AudioInput {
       }, 10001);
     }
   }
+
+  showInput(input) {}
 
   getCurrentLog() {
     console.group(`Current Log Report`);
@@ -90,6 +93,7 @@ export default class AudioInput {
   async restart() {
     if (!(await this.isAcceptableTimeLapse())) return;
     if (this.restartInProgress) return;
+    // if (this.audioListening) return;
     this.restartInProgress = true;
     setTimeout(() => {
       try {
@@ -102,16 +106,20 @@ export default class AudioInput {
   }
 
   async start() {
+    if (this.audioListening) return;
+
     this.AudioAnalysis.onresult = (e) => {
       let transcript = e.results[0][0].transcript.toString().toLowerCase();
       this.audioTranscriptLog.push([Date.now(), transcript]);
       let currentLog = this.audioTranscriptLog.join("");
       this.lastEntryTimestamp = Date.now();
 
-      if (currentLog.includes(this.keyPhrase.toLowerCase())) this.queryAI();
-      if (transcript.includes("current report")) this.getCurrentLog();
-      if (transcript.includes("archive report")) this.getArchiveLog();
-      if (transcript.includes("command report")) this.getCommandLog();
+      this.UI.showInput.notify(transcript);
+
+      // if (currentLog.includes(this.keyPhrase.toLowerCase())) this.queryAI();
+      // if (transcript.includes("current report")) this.getCurrentLog();
+      // if (transcript.includes("archive report")) this.getArchiveLog();
+      // if (transcript.includes("command report")) this.getCommandLog();
     };
 
     this.AudioAnalysis.onspeechstart = (e) => {
@@ -122,22 +130,22 @@ export default class AudioInput {
     this.AudioAnalysis.onspeechend = () => {
       this.speechInProgress = false;
       // console.log("ended");
-      this.restart();
+      // this.restart();
     };
 
     this.AudioAnalysis.addEventListener("start", () => {
       this.audioListening = true;
+      this.UI.isListening.notify();
     });
 
     this.AudioAnalysis.addEventListener("end", () => {
       this.audioListening = false;
+      this.UI.isNotListening.notify();
     });
 
     this.AudioAnalysis.onerror = (e) => {
-      console.log(
-        `${Date.now()} Recognition Error: ${e.error} : Restarting Loop...`
-      );
-      this.restart();
+      console.log(`${Date.now()} Recognition Error: ${e.error}`);
+      // this.restart();
     };
 
     this.checkTimeLapse();

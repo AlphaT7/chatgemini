@@ -6,20 +6,16 @@ from google import genai
 from chatgemini.settings import API_KEY
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def generate_content(request):
     client = client = genai.Client(api_key=API_KEY)
     response = client.models.generate_content(
-        model="gemini-2.0-flash", contents="what is the capital of the usa"
+        model="gemini-2.0-flash", contents=request.body
     )
-    print(response.text)
     return HttpResponse(response.text)
 
 
-# def index(request):
-#     return HttpResponse("Hello, world.")
-
-
+@api_view(["GET"])
 def index(request):
     template = loader.get_template("index.html")
     return HttpResponse(template.render())

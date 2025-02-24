@@ -1,6 +1,9 @@
+import UI from "./ui.js";
+const userState = new UI();
+
 export default class AudioInput {
-  constructor(UI) {
-    this.UI = UI;
+  constructor(audioOutput) {
+    this.audioOutput = audioOutput;
     this.keyPhrase = "computer";
     this.commandLog = [];
     this.audioTranscriptLog = [];
@@ -49,34 +52,44 @@ export default class AudioInput {
     }
   }
 
-  showInput(input) {}
-
-  getCurrentLog() {
-    console.group(`Current Log Report`);
-    this.audioTranscriptLog.forEach((input, i) => {
-      console.log(`Current Log Entry ${i + 1} [${input[0]}]: ${input[1]}`);
-    });
-    console.groupEnd();
+  async submitQuery(input) {
+    const regex = /\*\*/g;
+    const url = location.origin + "/ai_request/";
+    const response = await fetch(url, { method: "POST", body: input });
+    let output = (await response.text()).replaceAll(regex, "");
+    userState.update("aiTranscript", output);
+    if (await userState.update("isSpeechOn")) {
+      userState.update("showCancelSpeech");
+      this.audioOutput.speak(output);
+    }
   }
 
-  getArchiveLog() {
-    this.audioTranscriptLogArchive.forEach((input, i) => {
-      console.group(`Archive Log Report #${i + 1}`);
-      input.forEach((str, j) => {
-        console.log(`Archive Log Entry ${j + 1} [${str[0]}]: ${str[1]}`);
-      });
+  // getCurrentLog() {
+  //   console.group(`Current Log Report`);
+  //   this.audioTranscriptLog.forEach((input, i) => {
+  //     console.log(`Current Log Entry ${i + 1} [${input[0]}]: ${input[1]}`);
+  //   });
+  //   console.groupEnd();
+  // }
 
-      console.groupEnd();
-    });
-  }
+  // getArchiveLog() {
+  //   this.audioTranscriptLogArchive.forEach((input, i) => {
+  //     console.group(`Archive Log Report #${i + 1}`);
+  //     input.forEach((str, j) => {
+  //       console.log(`Archive Log Entry ${j + 1} [${str[0]}]: ${str[1]}`);
+  //     });
 
-  getCommandLog() {
-    console.group(`Command Log Report`);
-    this.commandLog.forEach((input, i) => {
-      console.log(`Command Log Entry ${i + 1} [${input[0]}]: ${input[1]}`);
-    });
-    console.groupEnd();
-  }
+  //     console.groupEnd();
+  //   });
+  // }
+
+  // getCommandLog() {
+  //   console.group(`Command Log Report`);
+  //   this.commandLog.forEach((input, i) => {
+  //     console.log(`Command Log Entry ${i + 1} [${input[0]}]: ${input[1]}`);
+  //   });
+  //   console.groupEnd();
+  // }
 
   queryAI() {
     this.audioTranscriptLogArchive[this.audioTranscriptLogArchive.length] =
@@ -90,32 +103,32 @@ export default class AudioInput {
     this.audioTranscriptLog.length = 0;
   }
 
-  async restart() {
-    if (!(await this.isAcceptableTimeLapse())) return;
-    if (this.restartInProgress) return;
-    // if (this.audioListening) return;
-    this.restartInProgress = true;
-    setTimeout(() => {
-      try {
-        if (!this.speechInProgress) this.AudioAnalysis.start();
-        this.restartInProgress = false;
-      } catch (e) {
-        console.log(`Failed to restart: ${e}`);
-      }
-    }, 250);
-  }
+  // async restart() {
+  //   if (!(await this.isAcceptableTimeLapse())) return;
+  //   if (this.restartInProgress) return;
+  //   // if (this.audioListening) return;
+  //   this.restartInProgress = true;
+  //   setTimeout(() => {
+  //     try {
+  //       if (!this.speechInProgress) this.AudioAnalysis.start();
+  //       this.restartInProgress = false;
+  //     } catch (e) {
+  //       console.log(`Failed to restart: ${e}`);
+  //     }
+  //   }, 250);
+  // }
 
   async start() {
     if (this.audioListening) return;
-
     this.AudioAnalysis.onresult = (e) => {
       let transcript = e.results[0][0].transcript.toString().toLowerCase();
       this.audioTranscriptLog.push([Date.now(), transcript]);
       let currentLog = this.audioTranscriptLog.join("");
       this.lastEntryTimestamp = Date.now();
 
-      this.UI.showInput.notify(transcript);
-
+      //   this.API.showInput.notify(transcript);
+      userState.update("userTranscript", transcript);
+      this.submitQuery(transcript);
       // if (currentLog.includes(this.keyPhrase.toLowerCase())) this.queryAI();
       // if (transcript.includes("current report")) this.getCurrentLog();
       // if (transcript.includes("archive report")) this.getArchiveLog();
@@ -135,16 +148,17 @@ export default class AudioInput {
 
     this.AudioAnalysis.addEventListener("start", () => {
       this.audioListening = true;
-      this.UI.isListening.notify();
+      userState.update("isListening");
     });
 
-    this.AudioAnalysis.addEventListener("end", () => {
+    this.AudioAnalysis.addEventListener("end", async () => {
       this.audioListening = false;
-      this.UI.isNotListening.notify();
+      userState.update("isNotListening");
     });
 
     this.AudioAnalysis.onerror = (e) => {
       console.log(`${Date.now()} Recognition Error: ${e.error}`);
+      userState.update("isNotListening");
       // this.restart();
     };
 

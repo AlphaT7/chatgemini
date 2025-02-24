@@ -11,6 +11,10 @@ export default class Observable {
     this.observers = this.observers.filter((observer) => observer !== func);
   }
 
+  list() {
+    console.log(this.observers);
+  }
+
   notify(data) {
     this.observers.forEach((observer) => observer(data));
   }

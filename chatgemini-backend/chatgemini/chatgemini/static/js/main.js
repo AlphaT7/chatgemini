@@ -1,23 +1,42 @@
-import UI from "./ui.js";
-import Observable from "./observer.js";
-import AudioInput from "./audioAnalysis.js";
+import AudioInput from "./audioInput.js";
+import AudioOutput from "./audioOutput.js";
 
 const $ = document.querySelector.bind(document);
-const ui = new UI();
-const isListening = new Observable();
-const isNotListening = new Observable();
-const showInput = new Observable();
 
-isListening.subscribe(ui.isListening);
-isNotListening.subscribe(ui.isNotListening);
-showInput.subscribe(ui.showInput);
+async function init(synth) {
+  if (typeof speechSynthesis === "undefined") return;
 
-const audioAnalysis = new AudioInput({
-  isListening,
-  isNotListening,
-  showInput,
-});
+  let defaultVoice =
+    speechSynthesis.getVoices().find((voice) => voice.name == "Daniel") ||
+    speechSynthesis.getVoices().find((voice) => voice.default);
 
-$("#button").addEventListener("pointerup", () => {
-  if (!audioAnalysis.audioListening) audioAnalysis.start();
-});
+  const synthObj = {
+    synth: synth,
+    defaultVoice: defaultVoice,
+  };
+
+  const audioOutput = new AudioOutput(synthObj);
+
+  const audioAnalysis = new AudioInput(audioOutput);
+
+  $("#button").addEventListener("pointerup", () => {
+    if ($("#button").dataset.type === "listen") {
+      if (audioAnalysis.audioListening) return;
+      audioOutput.speak("");
+      audioAnalysis.start();
+    } else {
+      audioOutput.stop();
+    }
+  });
+}
+
+const synth = speechSynthesis;
+setTimeout(() => init(synth), 100);
+// init();
+
+// if (
+//   typeof speechSynthesis !== "undefined" &&
+//   speechSynthesis.onvoiceschanged !== undefined
+// ) {
+//   speechSynthesis.onvoiceschanged = init;
+// }

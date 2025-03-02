@@ -1,7 +1,11 @@
 const $ = document.querySelector.bind(document);
+const userColor = "#19ab33";
+const aiColor = "#1e90ff";
+const defaultColor = "#595959";
+const cancelColor = "#ff4d4d";
 
 export default class UI {
-  constructor() {}
+  constructor() { }
 
   async update(func, options) {
     return this[func](options);
@@ -12,52 +16,52 @@ export default class UI {
   }
 
   async isListening() {
-    $("#listening").style.color = "#19ab33";
+    $("#listening").style.color = userColor;
     $("#listening").innerHTML = "Listening...";
-    $("#button").style.color = "#19ab33";
-    $("#button").style.borderColor = "#19ab33";
-    // $("#button").style.boxShadow = "0 4px 30px rgba(255, 255, 255, .85)";
+    $("#buttonIcon").style.color = userColor;
+    $("#button").style.borderColor = userColor;
     $("#button").classList.add("box-ripple");
     setTimeout(() => {
       $("#button").classList.remove("box-ripple");
     }, 900);
-    $("#micOnIndicator").style.color = "#19ab33";
-    $("#micOnIndicator").style.textShadow = "0 0 5px #19ab33";
+    $("#micOnIndicator").style.color = userColor;
+    $("#micOnIndicator").style.textShadow = `0 0 5px ${userColor}`;
   }
 
   async scrollToEnd() {
-    document.querySelectorAll(".scrollMargin").forEach((el) => {
-      el.remove();
-    });
-    $("#terminal").innerHTML += "<div class='scrollMargin'></div>";
+    $("#scrollMargin")?.remove();
+    $("#terminal").innerHTML += "<div id='scrollMargin'></div>";
     $("#tabContent1").scrollTop = $("#tabContent1").scrollHeight;
   }
 
   async showCancelSpeech() {
+    $("#listening").style.color = aiColor;
+    $("#listening").innerHTML = "AI speech in process...";
     $("#buttonIcon").classList.remove("fa-microphone");
     $("#buttonIcon").classList.add("fa-ban");
-    $("#buttonIcon").style.color = "#ff4d4d";
-    $("#button").style.borderColor = "#ff4d4d";
-    $("#button").style.boxShadow = "unset";
+    $("#buttonIcon").style.color = cancelColor;;
+    $("#button").style.borderColor = cancelColor;
     $("#button").dataset.type = "cancel";
+    $("#micOnIndicator").style.color = aiColor;
+    $("#micOnIndicator").style.textShadow = `0 0 5px ${aiColor}`;
+    $("#micOnIndicator").classList.add("fa-volume-up");
   }
 
   async isNotListening() {
-    $("#listening").style.color = "#595959";
+    $("#micOnIndicator").classList.remove("fa-volume-up");
+    $("#micOnIndicator").classList.add("fa-microphone");
+    $("#listening").style.color = defaultColor;
     $("#listening").innerHTML = "Press the button and start talking! =)";
-    $("#button").style.color = "#595959";
-    $("#button").style.borderColor = "#595959";
-    $("#button").style.boxShadow = "none";
-    $("#micOnIndicator").style.color = "#505050";
-    $("#micOnIndicator").style.textShadow = "unset";
+    $("#micOnIndicator").style.textShadow = "none";
+    $("#buttonIcon").style.color = defaultColor;
+    $("#button").style.borderColor = defaultColor;
+    $("#micOnIndicator").style.color = defaultColor;
   }
 
   async hideCancelSpeech() {
     $("#buttonIcon").classList.remove("fa-ban");
     $("#buttonIcon").classList.add("fa-microphone");
-    $("#buttonIcon").style.color = "#595959";
     $("#button").dataset.type = "listen";
-    this.isNotListening();
   }
 
   async userTranscript(input) {

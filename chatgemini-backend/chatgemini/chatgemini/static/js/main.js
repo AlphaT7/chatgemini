@@ -22,7 +22,7 @@ async function init(synth) {
   $("#button").addEventListener("pointerup", () => {
     if ($("#button").dataset.type === "listen") {
       if (audioAnalysis.audioListening) return;
-      audioOutput.speak("");
+      audioOutput.speak("!ignore!");
       audioAnalysis.start();
     } else {
       audioOutput.stop();
@@ -32,11 +32,3 @@ async function init(synth) {
 
 const synth = speechSynthesis;
 setTimeout(() => init(synth), 100);
-// init();
-
-// if (
-//   typeof speechSynthesis !== "undefined" &&
-//   speechSynthesis.onvoiceschanged !== undefined
-// ) {
-//   speechSynthesis.onvoiceschanged = init;
-// }

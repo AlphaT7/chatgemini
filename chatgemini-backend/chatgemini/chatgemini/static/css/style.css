@@ -20,6 +20,18 @@ body {
   font-size: 1em;
   font-family: "Raleway", Arial, sans-serif;
   background: linear-gradient(300deg, #83d6fe, #017499, #003f86);
+  background: linear-gradient(
+    175deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(64, 180, 191, 1) 78%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  background: linear-gradient(
+    175deg,
+    rgba(250, 250, 250, 1) 0%,
+    rgba(93, 177, 185, 1) 78%,
+    rgba(250, 250, 240, 1) 100%
+  );
   background-size: 180% 180%;
   animation: gradient-animation 18s ease infinite;
   font-family: "Nunito", sans-serif;
@@ -55,6 +67,7 @@ header h1 {
   flex: 1;
   align-self: center;
   font-family: "Tomorrow", sans-serif;
+  color: #333;
 }
 
 .button {
@@ -167,6 +180,10 @@ footer {
   justify-content: space-between;
   align-items: center;
   margin: 5px 0;
+
+  & span {
+    color: var(--defaultColor);
+  }
 }
 
 .toggle {
@@ -319,9 +336,13 @@ footer {
   border-bottom-right-radius: 0;
   display: flex;
   align-items: center;
+  width: 70%;
+  position: relative;
 
-  & div:nth-child(1) {
-    margin-right: 15px;
+  & div:nth-child(2) {
+    position: absolute;
+    left: 40px;
+    top: 14px;
   }
 }
 
@@ -350,11 +371,9 @@ footer {
   cursor: pointer;
   display: block;
   text-decoration: none;
-  color: #333;
   color: #f9f9f9;
   flex-grow: 3;
   text-align: center;
-  background-color: #f2f2f2;
   background-color: #777777;
   -webkit-user-select: none;
   -moz-user-select: none;

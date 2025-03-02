@@ -23,7 +23,8 @@ export default class audioOutput {
   }
 
   async speak(output) {
-    if (output === "!ignore!") return;
+
+    if (output === "" && this.defaultVoice.name !== "Daniel") return;
     const text = new SpeechSynthesisUtterance(output);
     text.voice = this.defaultVoice;
     this.synth.speak(text);

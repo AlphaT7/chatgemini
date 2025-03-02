@@ -22,7 +22,7 @@ async function init(synth) {
   $("#button").addEventListener("pointerup", () => {
     if ($("#button").dataset.type === "listen") {
       if (audioAnalysis.audioListening) return;
-      audioOutput.speak("!ignore!");
+      audioOutput.speak("");
       audioAnalysis.start();
     } else {
       audioOutput.stop();

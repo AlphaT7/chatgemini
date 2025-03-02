@@ -45,6 +45,7 @@ export default class UI {
     $("#micOnIndicator").style.color = aiColor;
     $("#micOnIndicator").style.textShadow = `0 0 5px ${aiColor}`;
     $("#micOnIndicator").classList.add("fa-volume-up");
+    $("#micOnIndicator").classList.remove("fa-microphone");
   }
 
   async isNotListening() {
@@ -55,7 +56,7 @@ export default class UI {
     $("#micOnIndicator").style.textShadow = "none";
     $("#buttonIcon").style.color = defaultColor;
     $("#button").style.borderColor = defaultColor;
-    $("#micOnIndicator").style.color = defaultColor;
+    $("#micOnIndicator").style.color = "unset";
   }
 
   async hideCancelSpeech() {

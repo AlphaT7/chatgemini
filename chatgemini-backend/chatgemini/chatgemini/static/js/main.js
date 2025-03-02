@@ -1,3 +1,4 @@
+import appState from "./appState.js";
 import AudioInput from "./audioInput.js";
 import AudioOutput from "./audioOutput.js";
 
@@ -15,14 +16,16 @@ async function init(synth) {
     defaultVoice: defaultVoice,
   };
 
-  const audioOutput = new AudioOutput(synthObj);
+  const AppState = new appState();
 
-  const audioAnalysis = new AudioInput(audioOutput);
+  const audioOutput = new AudioOutput(synthObj, AppState);
+
+  const audioAnalysis = new AudioInput(audioOutput, AppState);
 
   $("#button").addEventListener("pointerup", () => {
     if ($("#button").dataset.type === "listen") {
-      if (audioAnalysis.audioListening) return;
-      audioOutput.speak("");
+      if (AppState.getListeningState()) return;
+      audioOutput.speak(""); // necessary to start the speech synthesis; if not included, audioOutput.speak() will not work on IOS;
       audioAnalysis.start();
     } else {
       audioOutput.stop();

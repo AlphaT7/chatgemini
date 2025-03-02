@@ -15,6 +15,19 @@ export default class UI {
     return $("#isSpeechOn").checked;
   }
 
+  async aiProcessing() {
+    $("#listening").style.color = aiColor;
+    $("#listening").innerHTML = "AI processing...";
+    $("#buttonIcon").style.color = aiColor;
+    $("#button").style.borderColor = aiColor;
+    $("#buttonIcon").classList.add("fa-clock-o");
+    $("#buttonIcon").classList.remove("fa-microphone");
+    $("#micOnIndicator").style.color = aiColor;
+    $("#micOnIndicator").style.textShadow = `0 0 5px ${aiColor}`;
+    $("#micOnIndicator").classList.add("fa-clock-o");
+    $("#micOnIndicator").classList.remove("fa-microphone");
+  }
+
   async isListening() {
     $("#listening").style.color = userColor;
     $("#listening").innerHTML = "Listening...";
@@ -32,6 +45,7 @@ export default class UI {
     $("#scrollMargin")?.remove();
     $("#terminal").innerHTML += "<div id='scrollMargin'></div>";
     $("#tabContent1").scrollTop = $("#tabContent1").scrollHeight;
+
   }
 
   async showCancelSpeech() {
@@ -45,11 +59,11 @@ export default class UI {
     $("#micOnIndicator").style.color = aiColor;
     $("#micOnIndicator").style.textShadow = `0 0 5px ${aiColor}`;
     $("#micOnIndicator").classList.add("fa-volume-up");
-    $("#micOnIndicator").classList.remove("fa-microphone");
+    $("#micOnIndicator").classList.remove("fa-clock-o");
   }
 
   async isNotListening() {
-    $("#micOnIndicator").classList.remove("fa-volume-up");
+    $("#micOnIndicator").classList.remove("fa-clock-o");
     $("#micOnIndicator").classList.add("fa-microphone");
     $("#listening").style.color = defaultColor;
     $("#listening").innerHTML = "Press the button and start talking! =)";

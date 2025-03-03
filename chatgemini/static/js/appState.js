@@ -13,14 +13,6 @@ export default class appState {
         this.isListening = value;
     }
 
-    getSpeakingState() {
-        return this.isSpeaking;
-    }
-
-    setSpeakingState(value) {
-        this.isSpeaking = value;
-    }
-
     getAiProcessingState() {
         return this.aiProcessing;
     }
